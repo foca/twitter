@@ -59,15 +59,15 @@ module Twitter
       def middleware
         @middleware ||= Faraday::RackBuilder.new do |faraday|
           # Convert file uploads to Faraday::UploadIO objects
-          faraday.request :twitter_multipart_with_file
+          faraday.use Twitter::REST::Request::MultipartWithFile
           # Checks for files in the payload, otherwise leaves everything untouched
           faraday.request :multipart
           # Encodes as "application/x-www-form-urlencoded" if not already encoded
           faraday.request :url_encoded
           # Handle error responses
-          faraday.response :twitter_raise_error
+          faraday.use Twitter::REST::Response::RaiseError
           # Parse JSON response bodies
-          faraday.response :twitter_parse_json
+          faraday.use Twitter::REST::Response::ParseJson
           # Set default HTTP adapter
           faraday.adapter :net_http
         end
